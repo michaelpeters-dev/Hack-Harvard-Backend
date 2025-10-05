@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Go to project root
 cd "$(dirname "$0")"
 
-# 1) Ensure Ollama server is running (only once per boot)
-if ! lsof -i :11434 >/dev/null 2>&1; then
+# Kill anything already on 8080
+if lsof -ti:8080 >/dev/null; then
+  kill -9 $(lsof -ti:8080)
+fi
+
+# Start Ollama if not running
+if ! pgrep -x "ollama" >/dev/null; then
   echo "Starting Ollama..."
   ollama serve &
   sleep 2
@@ -13,12 +17,11 @@ else
   echo "Ollama already running."
 fi
 
-# 2) Pull the LLaVA model (idempotent, skips if present)
+# Pull model
 ollama pull llava:7b
 
-# 3) Setup Python venv + deps (only installs missing packages)
+# Setup venv
 if [ ! -d ".venv" ]; then
-  echo "Creating venv..."
   python3 -m venv .venv
 fi
 
@@ -26,6 +29,6 @@ fi
 pip install -U pip
 pip install -r requirements.txt
 
-# 4) Run the API server (listens on port 8000)
-echo "Starting caption API at http://localhost:8000"
-uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+# Run API server
+echo "Starting caption API at http://0.0.0.0:8080"
+uvicorn server:app --host 0.0.0.0 --port 8080 --reload

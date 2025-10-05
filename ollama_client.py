@@ -23,7 +23,7 @@ def caption_image(img_bytes: bytes) -> tuple[str, float]:
     small = _downscale(img_bytes, 512)
     payload = {
         "model": MODEL,
-        "prompt": "Describe the image in one short, concrete caption.",
+        "prompt": "Return one short sentence (<=12 words) describing the central object.",
         "images": [base64.b64encode(small).decode()],
         "stream": False,
         "options": {"temperature": 0.1, "num_predict": 32}

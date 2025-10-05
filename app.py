@@ -28,7 +28,7 @@ def caption(path: str) -> str:
 
     payload = {
         "model": MODEL,
-        "prompt": "Describe the image in one short, concrete caption.",
+        "prompt": "Return one short sentence (<=12 words) describing the central object.",
         "images": [img_b64],
         "stream": False,
         "options": {
